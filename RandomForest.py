@@ -4,8 +4,7 @@ import pandas as pd
 
 
 class Tree:
-    def __init__(self, num, vals, df, threshold, left=None, right=None):
-        self.num = num
+    def __init__(self, vals, df, threshold = None, left=None, right=None):
         self.vals = vals
         self.df = df
         self.threshold = threshold
@@ -13,19 +12,50 @@ class Tree:
         self.right = right
         self.create()
 
-    def createOptimalSplit(self, df, col):
-        df = df.iloc[:, col]
+    def createOptimalSplit(self, val, df, col):
+        columnOfInterest = df.iloc[:, col]
+        unq = columnOfInterest.unique()
 
-        return split
-    
-    
-    def create(self):
-        df = self.df
-        if (numCols) < 50:
+        # Standard deviation
+        def score(dep, df, split):
+            lhs = df<=split
+            print(dep[lhs])
+            return (dep[lhs].std() + dep[~lhs].std())/len(dep)
+        
+        #Try to minimize the standard deviation amongst the two splits
+        min = 100
+        minSplit = -1
+        for i in unq:
+            curScore = score(val, columnOfInterest, i)
+            if (curScore.values)[0] < min:
+                min = (curScore.values)[0]
+                minSplit = i
+
+        #Get teh left and right df to pass to subtrees
+        left_mask = df[col] <= minSplit
+        leftVal = df[left_mask]
+        leftdf = df[left_mask]
+
+        right_mask = df[col] > minSplit
+        rightVal = df[right_mask]
+        rightdf = df[right_mask]
+
+        #Stop if either has a size less than 50
+        if (leftdf.shape)[0] < 50 or (rightdf.shape)[0] < 50:
             return
         else:
-            numCols = (df.shape)[1]
-            randomCol = int(random.random() * numCols)
+            #Assign left and right splits
+            self.left = Tree(leftVal, leftdf)
+            self.right = Tree(rightVal, rightdf)
+
+            #Assigning threshold so we can predict
+            self.threshold = minSplit
+
+    def create(self):
+        df = self.df
+        numCols = (df.shape)[1]
+        randomCol = int(random.random() * numCols)
+        self.createOptimalSplit(self.vals, df, randomCol)
 
 
     
@@ -42,26 +72,21 @@ class RandomForest:
         self.decisionTrees = decisionTrees
 
 
-    def createDecisionTree(self, df):
-
-        return
+    def createDecisionTree(self, df, vals):
+        # Return the head of the tree
+        return Tree(vals,df)
     
     def createRandomForest(self):
         df = self.df
         itr = self.decisionTrees
         for i in range(itr):
             rows = (df.shape)[0]
-            cols = (df.shape)[1]
-
+            
             #Get the random rows used
             totalRows = range(0, rows)
             randomRows = random.sample(totalRows, int(rows * 0.75))
 
-            #Get the random 2 rows
-            totalCols = range(0, cols)
-            randomCols = random.sample(totalCols, 2)
-
-            decisionTree = self.createDecisionTree(df.iloc[randomRows, randomCols], vals)
+            decisionTree = self.createDecisionTree(df.iloc[randomRows], self.vals.iloc[randomRows])
 
             self.trees.append(decisionTree)
 

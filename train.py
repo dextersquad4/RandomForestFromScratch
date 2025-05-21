@@ -18,12 +18,12 @@ if __name__ == "__main__":
 
     catagorical = ['Breed', 'Gender', 'Neutered_or_spayed', 'Fur_colour_dominant', 'Fur_pattern', 'Eye_colour', 'Allowed_outdoor', 'Preferred_food', 'Country']
 
-    ind_val = pd.DataFrame(data=df['Neutered_or_spayed'])
+    ind_val = pd.DataFrame(data=df['Neutered_or_spayed'].cat.codes)
     for cata in catagorical: 
         if (cata != "Neutered_or_spayed"):
             df[cata] = df[cata].cat.codes
         else:
-            df.remove(cata)
+            df.pop(cata)
 
 
     #Initialize rf object
