@@ -19,7 +19,6 @@ class Tree:
         # Standard deviation
         def score(dep, df, split):
             lhs = df<=split
-            print(dep[lhs])
             return (dep[lhs].std() + dep[~lhs].std())/len(dep)
         
         #Try to minimize the standard deviation amongst the two splits
@@ -32,11 +31,11 @@ class Tree:
                 minSplit = i
 
         #Get teh left and right df to pass to subtrees
-        left_mask = df[col] <= minSplit
+        left_mask = df.iloc[:, col] <= minSplit
         leftVal = df[left_mask]
         leftdf = df[left_mask]
 
-        right_mask = df[col] > minSplit
+        right_mask =  df.iloc[:, col] > minSplit
         rightVal = df[right_mask]
         rightdf = df[right_mask]
 
@@ -87,6 +86,7 @@ class RandomForest:
             randomRows = random.sample(totalRows, int(rows * 0.75))
 
             decisionTree = self.createDecisionTree(df.iloc[randomRows], self.vals.iloc[randomRows])
+            print(f'Finished {i} tree')
 
             self.trees.append(decisionTree)
 
