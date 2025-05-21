@@ -15,35 +15,40 @@ class Tree:
         self.right = right
         self.create()
 
-    def createOptimalSplit(self, val, df, col):
-        columnOfInterest = df.iloc[:, col]
-        unq = columnOfInterest.unique()
-
-        # Standard deviation
-        def score(dep, df, split):
-            lhs = df<=split
-            return (dep[lhs].std() + dep[~lhs].std())/len(dep)
-        
-        #Try to minimize the standard deviation amongst the two splits
+    def createOptimalSplit(self, val, df):
         min = 100
         minSplit = -1
-        for i in unq:
-            curScore = score(val, columnOfInterest, i)
-            if (curScore.values)[0] < min:
-                min = (curScore.values)[0]
-                minSplit = i
+        minColIndex = None
+        minCol = None
+        #iterate for all the possible rows
+        for j,col in enumerate(df.columns):
+            columnOfInterest = df[col]
+            unq = columnOfInterest.unique()
+            # Standard deviation
+            def score(dep, df, split):
+                lhs = df<=split
+                return (dep[lhs].std() + dep[~lhs].std())/len(dep)
+            
+            #Try to minimize the standard deviation amongst the two splits
+            for i in unq:
+                curScore = score(val, columnOfInterest, i)
+                if (curScore.values)[0] < min:
+                    min = (curScore.values)[0]
+                    minSplit = i
+                    minColIndex = j
+                    minCol = col
 
         #Get teh left and right df to pass to subtrees
-        left_mask = df.iloc[:, col] <= minSplit
+        left_mask = df.iloc[:, minColIndex] <= minSplit
         leftVal = self.vals[left_mask]
         leftdf = df[left_mask]
 
-        right_mask =  df.iloc[:, col] > minSplit
+        right_mask =  df.iloc[:, minColIndex] > minSplit
         rightVal = self.vals[right_mask]
         rightdf = df[right_mask]
 
         #Stop if either has a size less than 50
-        if (leftdf.shape)[0] < 10 or (rightdf.shape)[0] < 10 or self.depth == 5:
+        if (leftdf.shape)[0] < 10 or (rightdf.shape)[0] < 10 or self.depth == 10:
             return
         else:
             #Assign left and right splits
@@ -52,14 +57,12 @@ class Tree:
 
             #Assigning threshold so we can predict
             self.threshold = minSplit
-            self.colEditted = df.columns[col]
+            self.colEditted = minCol
 
     def create(self):
         df = self.df
         self.mode = (self.vals.mode()).iloc[0,0]
-        numCols = (df.shape)[1]
-        randomCol = int(random.random() * numCols)
-        self.createOptimalSplit(self.vals, df, randomCol)
+        self.createOptimalSplit(self.vals, df)
 
     def assignLeftRight(self, series):
         if (series[self.colEditted] <= self.threshold):
@@ -88,12 +91,16 @@ class RandomForest:
         itr = self.decisionTrees
         for i in range(itr):
             rows = (df.shape)[0]
+            cols = (df.shape)[1]
             
             #Get the random rows used
             totalRows = range(0, rows)
             randomRows = random.sample(totalRows, int(rows * 0.75))
+            
+            totalCols = range(0, cols)
+            randomCols = random.sample(totalCols, 10)
 
-            decisionTree = self.createDecisionTree(df.iloc[randomRows], self.vals.iloc[randomRows])
+            decisionTree = self.createDecisionTree(df.iloc[randomRows, randomCols], self.vals.iloc[randomRows])
             print(f'Finished {i+1}th tree')
 
             self.trees.append(decisionTree)
