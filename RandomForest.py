@@ -4,9 +4,15 @@ import pandas as pd
 
 
 class Tree:
-    def __init__(self, left=None, right=None):
+    def __init__(self, df, left=None, right=None):
+        self.df = df
         self.left = left
         self.right = right
+
+    def create():
+        
+    
+    
 
 class RandomForest:
     trees = []
