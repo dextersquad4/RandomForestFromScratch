@@ -2,7 +2,6 @@ import pandas as pd
 import RandomForest
 
 
-
 if __name__ == "__main__":
 
     #get data and assign catagorical data

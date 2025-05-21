@@ -1,7 +1,9 @@
 import random
 import pandas as pd
 
-class Tree:
+
+# I need to 
+# class Tree:
 
 class RandomForest:
     trees = []
@@ -13,7 +15,7 @@ class RandomForest:
         self.decisionTrees = decisionTrees
 
 
-    def createDecisionTree():
+    def createDecisionTree(df):
 
         return
     
@@ -21,11 +23,18 @@ class RandomForest:
         df = self.df
         itr = self.decisionTrees
         for i in range(itr):
-
             rows = (df.shape)[0]
             cols = (df.shape)[1]
-            total = range(0, cols)
-            randomRows = random.sample(int(rows * 0.75), total)
-            print(randomRows)
-            
+
+            #Get the random rows used
+            totalRows = range(0, rows)
+            randomRows = random.sample(totalRows, int(rows * 0.75))
+
+            #Get the random 2 rows
+            totalCols = range(0, cols)
+            randomCols = random.sample(totalCols, 2)
+
+            decisionTree = self.createDecisionTree(df.iloc[randomRows, randomCols])
+
+            self.trees.append(decisionTree)
    
