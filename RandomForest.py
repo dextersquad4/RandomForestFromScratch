@@ -2,8 +2,11 @@ import random
 import pandas as pd
 
 
-# I need to 
-# class Tree:
+
+class Tree:
+    def __init__(self, left=None, right=None):
+        self.left = left
+        self.right = right
 
 class RandomForest:
     trees = []
@@ -37,4 +40,5 @@ class RandomForest:
             decisionTree = self.createDecisionTree(df.iloc[randomRows, randomCols])
 
             self.trees.append(decisionTree)
+
    
