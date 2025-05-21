@@ -1,6 +1,17 @@
 import pandas as pd
 import RandomForest
 
+def evaluateModel(rf, ind_val, dep_val):
+    missed = 0
+    made = 0
+    for index, row in ind_val.iterrows():
+        if rf.predict(row) != dep_val.at[index, 0]:
+            missed+= 1 
+        else:
+            made+=1
+    print(f'Accurcy: {made / (missed+made)}')
+    return
+
 
 if __name__ == "__main__":
 
@@ -18,22 +29,19 @@ if __name__ == "__main__":
 
     catagorical = ['Breed', 'Gender', 'Neutered_or_spayed', 'Fur_colour_dominant', 'Fur_pattern', 'Eye_colour', 'Allowed_outdoor', 'Preferred_food', 'Country']
 
-    ind_val = pd.DataFrame(data=df['Neutered_or_spayed'].cat.codes)
+    d_val = pd.DataFrame(data=df['Neutered_or_spayed'].cat.codes)
     for cata in catagorical: 
         if (cata != "Neutered_or_spayed"):
             df[cata] = df[cata].cat.codes
         else:
             df.pop(cata)
-
-
     #Initialize rf object
-    minSplit = 50
-    leafDepth = 5
     numDecisionTrees = 50
 
-    rf = RandomForest.RandomForest(df, ind_val, 50, 5, 50)
+    rf = RandomForest.RandomForest(df, d_val, numDecisionTrees)
     rf.createRandomForest()
 
+    evaluateModel(rf, df, d_val)
 
 
 
