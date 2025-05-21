@@ -18,15 +18,20 @@ if __name__ == "__main__":
 
     catagorical = ['Breed', 'Gender', 'Neutered_or_spayed', 'Fur_colour_dominant', 'Fur_pattern', 'Eye_colour', 'Allowed_outdoor', 'Preferred_food', 'Country']
 
-    for cata in catagorical:
-        df[cata] = df[cata].cat.codes
+    ind_val = pd.DataFrame(data=df['Neutered_or_spayed'])
+    for cata in catagorical: 
+        if (cata != "Neutered_or_spayed"):
+            df[cata] = df[cata].cat.codes
+        else:
+            df.remove(cata)
+
 
     #Initialize rf object
     minSplit = 50
     leafDepth = 5
     numDecisionTrees = 50
 
-    rf = RandomForest.RandomForest(df, 50, 5, 50)
+    rf = RandomForest.RandomForest(df, ind_val, 50, 5, 50)
     rf.createRandomForest()
 
 
